@@ -34,6 +34,7 @@ const projects = [
       "A development foundation for local emergency operations: coordinating verified alerts, SOS intake, evacuation context, and offline-aware resident workflows.",
     tags: ["Operations", "Resiliency"],
     stack: ["FastAPI", "PostGIS", "Next.js", "Expo"],
+    trace: ["backend/app", "frontend", "mobile", "docs/architecture.md"],
     image: "/manus-storage/jonnywik-command-center-case-study_61cd2594.png",
     repo: "https://github.com/Jonnywik/EnvScie-CommandCenter",
     accent: "teal",
@@ -53,6 +54,7 @@ const projects = [
       "A responsive HR operations workspace for onboarding, attendance, payroll approvals, claims, and employee-facing workflows.",
     tags: ["Operations", "People systems"],
     stack: ["TypeScript", "React", "tRPC", "Drizzle"],
+    trace: ["client", "server", "drizzle", "*.test.ts"],
     image: "/manus-storage/jonnywik-employee-dashboard-case-study_61981e68.png",
     repo: "https://github.com/Jonnywik/employee-management-dashboard",
     accent: "orange",
@@ -102,6 +104,16 @@ function RouteMark({ className = "" }: { className?: string }) {
   );
 }
 
+function RouteStamp({ className = "", label = "SIGNAL ROUTE" }: { className?: string; label?: string }) {
+  return (
+    <span className={`route-stamp ${className}`} aria-hidden="true">
+      <span className="route-stamp-orbit" />
+      <RouteMark />
+      <small>{label}</small>
+    </span>
+  );
+}
+
 export default function Home() {
   const [activeFilter, setActiveFilter] = useState<Filter>("All");
   const [selectedProject, setSelectedProject] = useState(projects[0].id);
@@ -133,7 +145,7 @@ export default function Home() {
 
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Jonnywik portfolio home">
-          <RouteMark />
+          <RouteStamp label="J / 01" />
           <span>JONNYWIK</span>
           <i aria-hidden="true" />
           <small>PORTFOLIO / 2026</small>
@@ -184,6 +196,7 @@ export default function Home() {
               <a href="https://github.com/Jonnywik" target="_blank" rel="noreferrer" className="button button-quiet"><Github size={17} /> View GitHub</a>
             </div>
           </div>
+          <RouteStamp className="hero-stamp" label="J / SYSTEM MAP" />
           <aside className="hero-status" aria-label="Portfolio status">
             <div className="status-kicker"><span /> CURRENT SIGNAL</div>
             <strong>Open source portfolio</strong>
@@ -231,6 +244,10 @@ export default function Home() {
                   aria-label={`Open ${project.title} case study`}
                 >
                   <img src={project.image} alt="Abstract editorial visual representing the project’s systems and workflows" />
+                  <span className="source-trace source-trace-card" aria-hidden="true">
+                    <small>VERIFIED SOURCE TRACE</small>
+                    <code>{project.trace.join("  /  ")}</code>
+                  </span>
                   <span className="project-image-overlay"><span>Trace case study</span><ArrowDownRight size={19} /></span>
                 </button>
                 <div className="project-card-content">
@@ -261,8 +278,13 @@ export default function Home() {
             <div className="case-visual">
               <img src={selected.image} alt="Abstract visual for the selected portfolio project" />
               <div className="case-visual-caption"><span>System focus</span><strong>{selected.tags.join(" / ")}</strong></div>
+              <div className="case-source-map">
+                <span>01 / SOURCE MAP</span>
+                {selected.trace.map((item, index) => <code key={item}><i>{String(index + 1).padStart(2, "0")}</i>{item}</code>)}
+              </div>
             </div>
             <div className="case-copy">
+              <RouteStamp className="case-stamp" label="DECISION RECORD" />
               <p className="section-index">{selected.eyebrow}</p>
               <h3>{selected.title}</h3>
               <p className="lead-copy">{selected.summary}</p>
