@@ -121,6 +121,33 @@ function RouteStamp({ className = "", label = "SIGNAL ROUTE" }: { className?: st
   );
 }
 
+function SignalField({ active = false }: { active?: boolean }) {
+  return (
+    <svg className={`signal-field ${active ? "is-active" : ""}`} viewBox="0 0 1440 720" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="signal-teal" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#2dd4bf" stopOpacity="0" /><stop offset="0.36" stopColor="#2dd4bf" stopOpacity="0.44" /><stop offset="0.78" stopColor="#5eead4" stopOpacity="0.92" /><stop offset="1" stopColor="#2dd4bf" stopOpacity="0" /></linearGradient>
+        <linearGradient id="signal-violet" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#a78bfa" stopOpacity="0" /><stop offset="0.65" stopColor="#a78bfa" stopOpacity="0.64" /><stop offset="1" stopColor="#a78bfa" stopOpacity="0" /></linearGradient>
+        <linearGradient id="signal-orange" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#fb923c" stopOpacity="0" /><stop offset="0.5" stopColor="#fb923c" stopOpacity="0.72" /><stop offset="1" stopColor="#fb923c" stopOpacity="0" /></linearGradient>
+        <filter id="signal-glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="6" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+      </defs>
+      <g className="signal-routes">
+        <path className="signal-route route-a" d="M-80 412 C140 352 190 500 360 410 S620 292 736 374 S910 508 1088 310 S1284 86 1520 144" />
+        <path className="signal-route route-b" d="M-100 456 C116 390 214 542 392 446 S604 318 760 416 S980 518 1134 284 S1320 114 1512 170" />
+        <path className="signal-route route-c" d="M-120 510 C92 452 246 584 432 492 S640 356 798 450 S1008 556 1174 338 S1336 168 1540 208" />
+        <path className="signal-route route-d" d="M432 608 C590 522 682 436 808 462 S1018 504 1156 338 S1320 158 1524 104" />
+        <path className="signal-route route-e" d="M718 662 C830 570 884 458 1002 430 S1152 316 1270 156 S1400 86 1520 70" />
+        <path className="signal-route route-f" d="M-60 340 C132 280 244 378 374 326 S638 168 812 282 S1056 426 1192 220 S1370 88 1510 28" />
+      </g>
+      <g className="signal-packets" filter="url(#signal-glow)"><circle className="signal-packet packet-a" cx="1016" cy="410" r="5" /><circle className="signal-packet packet-b" cx="1112" cy="302" r="4" /><circle className="signal-packet packet-c" cx="1242" cy="174" r="4" /></g>
+      <g className="signal-nodes" filter="url(#signal-glow)">
+        <circle className="signal-node-ring node-teal" cx="1018" cy="410" r="20" /><circle className="signal-node node-teal" cx="1018" cy="410" r="7" />
+        <circle className="signal-node-ring node-orange" cx="1244" cy="174" r="18" /><circle className="signal-node node-orange" cx="1244" cy="174" r="6" />
+        <circle className="signal-node-ring node-violet" cx="1382" cy="62" r="16" /><circle className="signal-node node-violet" cx="1382" cy="62" r="5" />
+      </g>
+    </svg>
+  );
+}
+
 export default function Home() {
   const [activeFilter, setActiveFilter] = useState<Filter>("All");
   const [selectedProject, setSelectedProject] = useState(projects[0].id);
@@ -227,9 +254,10 @@ export default function Home() {
       </header>
 
       <main id="main-content">
-        <section id="top" className="hero-section" aria-labelledby="hero-title">
+        <section id="top" className={`hero-section ${routeScanActive ? "is-scanning" : ""}`} aria-labelledby="hero-title">
           <div className="hero-art" aria-hidden="true" />
           <div className="hero-grid" aria-hidden="true" />
+          <SignalField active={routeScanActive} />
           <div className="hero-content">
             <div className="eyebrow-row"><CircleDot size={13} /> DOMAIN / SYSTEM / EVIDENCE</div>
             <h1 id="hero-title">Software for work that <em>has to keep moving.</em></h1>
