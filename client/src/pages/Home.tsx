@@ -2,10 +2,11 @@
  * Portfolio Command Center design reminder: dark technical editorial, asymmetric
  * evidence panels, signal teal/orange emphasis, and interactions that reveal work.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowDownRight,
   ArrowUpRight,
+  Activity,
   Braces,
   CheckCircle2,
   ChevronRight,
@@ -17,6 +18,8 @@ import {
   Menu,
   Moon,
   Network,
+  Pause,
+  Play,
   ShieldCheck,
   Sparkles,
   Sun,
@@ -29,13 +32,15 @@ const projects = [
   {
     id: "command-center",
     title: "Code for Resilience",
-    eyebrow: "01 / Disaster operations",
+    eyebrow: "01 / RESILIENCE / SYSTEM / VERIFIED",
     summary:
       "A development foundation for local emergency operations: coordinating verified alerts, SOS intake, evacuation context, and offline-aware resident workflows.",
     tags: ["Operations", "Resiliency"],
     stack: ["FastAPI", "PostGIS", "Next.js", "Expo"],
     trace: ["backend/app", "frontend", "mobile", "docs/architecture.md"],
-    image: "/manus-storage/jonnywik-command-center-case-study_61cd2594.png",
+    image: "/manus-storage/command-center-sanitized_40ed0991.png",
+    imageAlt: "Sanitized demo interface for the Resilience Command Center",
+    evidenceLabel: "SANITIZED DEMO INTERFACE",
     repo: "https://github.com/Jonnywik/EnvScie-CommandCenter",
     accent: "teal",
     evidence: [
@@ -49,13 +54,15 @@ const projects = [
   {
     id: "employee-dashboard",
     title: "Employee Management Dashboard",
-    eyebrow: "02 / People operations",
+    eyebrow: "02 / PEOPLE / SYSTEM / VERIFIED",
     summary:
       "A responsive HR operations workspace for onboarding, attendance, payroll approvals, claims, and employee-facing workflows.",
     tags: ["Operations", "People systems"],
     stack: ["TypeScript", "React", "tRPC", "Drizzle"],
     trace: ["client", "server", "drizzle", "*.test.ts"],
-    image: "/manus-storage/jonnywik-employee-dashboard-case-study_61981e68.png",
+    image: "/manus-storage/employee-dashboard-sanitized_6c6b59cc.png",
+    imageAlt: "Sanitized demo interface for the Employee Management Dashboard",
+    evidenceLabel: "SANITIZED DEMO INTERFACE",
     repo: "https://github.com/Jonnywik/employee-management-dashboard",
     accent: "orange",
     evidence: [
@@ -120,6 +127,7 @@ export default function Home() {
   const [activePrinciple, setActivePrinciple] = useState(principles[0].id);
   const [lightMode, setLightMode] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [routeScanActive, setRouteScanActive] = useState(false);
 
   const visibleProjects = useMemo(
     () =>
@@ -134,8 +142,45 @@ export default function Home() {
     principles.find((principle) => principle.id === activePrinciple) ?? principles[0];
   const PrincipleIcon = chosenPrinciple.icon;
 
+  useEffect(() => {
+    if (!routeScanActive) return undefined;
+
+    const routeInterval = window.setInterval(() => {
+      setSelectedProject((current) => {
+        const currentIndex = projects.findIndex((project) => project.id === current);
+        return projects[(currentIndex + 1) % projects.length].id;
+      });
+    }, 4200);
+
+    return () => window.clearInterval(routeInterval);
+  }, [routeScanActive]);
+
+  useEffect(() => {
+    const handleRouteShortcut = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.matches("input, textarea, select, [contenteditable='true']")) return;
+
+      if (event.key === "1" || event.key === "2") {
+        chooseProject(projects[Number(event.key) - 1].id);
+      }
+      if (event.key.toLowerCase() === "r") {
+        setRouteScanActive((active) => !active);
+      }
+    };
+
+    window.addEventListener("keydown", handleRouteShortcut);
+    return () => window.removeEventListener("keydown", handleRouteShortcut);
+  }, []);
+
   const chooseProject = (id: string) => {
     setSelectedProject(id);
+    document.getElementById("case-study")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const startRouteScan = () => {
+    setActiveFilter("All");
+    setRouteScanActive(true);
     document.getElementById("case-study")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
@@ -146,9 +191,9 @@ export default function Home() {
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Jonnywik portfolio home">
           <RouteStamp label="J / 01" />
-          <span>JONNYWIK</span>
+          <strong>JONNYWIK</strong>
           <i aria-hidden="true" />
-          <small>PORTFOLIO / 2026</small>
+          <small>COMMAND CENTER / 2026</small>
         </a>
 
         <nav className={`main-nav ${menuOpen ? "is-open" : ""}`} aria-label="Primary navigation">
@@ -186,13 +231,14 @@ export default function Home() {
           <div className="hero-art" aria-hidden="true" />
           <div className="hero-grid" aria-hidden="true" />
           <div className="hero-content">
-            <div className="eyebrow-row"><CircleDot size={13} /> SYSTEMS / PEOPLE / RESILIENCE</div>
+            <div className="eyebrow-row"><CircleDot size={13} /> DOMAIN / SYSTEM / EVIDENCE</div>
             <h1 id="hero-title">Software for work that <em>has to keep moving.</em></h1>
             <p className="hero-copy">
               I’m Jonnywik, a full-stack developer building resilient, user-centred operational software—where clarity, safeguards, and real workflows shape the interface.
             </p>
             <div className="hero-cta-row">
               <a href="#projects" className="button button-primary">Explore the work <ArrowDownRight size={18} /></a>
+              <button type="button" className="button button-scan" onClick={startRouteScan}><Activity size={17} /> Run route scan</button>
               <a href="https://github.com/Jonnywik" target="_blank" rel="noreferrer" className="button button-quiet"><Github size={17} /> View GitHub</a>
             </div>
           </div>
@@ -202,6 +248,7 @@ export default function Home() {
             <strong>Open source portfolio</strong>
             <p>Two flagship systems, documented decisions, and code-first evidence.</p>
             <div className="hero-coordinate"><span>14° 35’</span><span>125° 11’</span></div>
+            <span className="shortcut-hint">Press <kbd>1</kbd> / <kbd>2</kbd> to trace · <kbd>R</kbd> to scan</span>
           </aside>
           <div className="hero-fact-strip" aria-label="Technology and focus areas">
             <span><Code2 size={15} /> Full-stack delivery</span>
@@ -213,14 +260,14 @@ export default function Home() {
         <section id="projects" className="section project-section" aria-labelledby="projects-title">
           <div className="section-heading split-heading">
             <div>
-              <p className="section-index">01 / FEATURED SYSTEMS</p>
+              <p className="section-index">01 / DOMAIN / SYSTEM / EVIDENCE</p>
               <h2 id="projects-title">Follow the work,<br /><em>not the noise.</em></h2>
             </div>
             <p className="section-note">Each project is a traceable system: a problem, a design boundary, and the engineering choices used to carry it forward.</p>
           </div>
 
           <div className="filter-bar" role="toolbar" aria-label="Filter portfolio projects">
-            <span className="filter-label"><Sparkles size={15} /> Filter field</span>
+            <span className="filter-label"><Sparkles size={15} /> DOMAIN FILTER / SELECT</span>
             {filters.map((filter) => (
               <button
                 key={filter}
@@ -243,12 +290,13 @@ export default function Home() {
                   onClick={() => chooseProject(project.id)}
                   aria-label={`Open ${project.title} case study`}
                 >
-                  <img src={project.image} alt="Abstract editorial visual representing the project’s systems and workflows" />
+                  <img src={project.image} alt={project.imageAlt} />
+                  <span className="interface-evidence-label">{project.evidenceLabel}</span>
                   <span className="source-trace source-trace-card" aria-hidden="true">
                     <small>VERIFIED SOURCE TRACE</small>
                     <code>{project.trace.join("  /  ")}</code>
                   </span>
-                  <span className="project-image-overlay"><span>Trace case study</span><ArrowDownRight size={19} /></span>
+                  <span className="project-image-overlay"><span>Inspect evidence</span><ArrowDownRight size={19} /></span>
                 </button>
                 <div className="project-card-content">
                   <div className="project-meta"><span>{project.eyebrow}</span><a href={project.repo} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} repository`}><Github size={17} /></a></div>
@@ -264,7 +312,7 @@ export default function Home() {
 
         <section id="case-study" className="section case-study-section" aria-labelledby="case-title">
           <div className="case-study-rail">
-            <p className="section-index">02 / CASE STUDY SIGNAL</p>
+            <p className="section-index">02 / EVIDENCE / DECISION / TRACE</p>
             <h2 id="case-title">The detail behind<br /><em>the interface.</em></h2>
             <div className="case-selector" aria-label="Choose a case study">
               {projects.map((project, index) => (
@@ -273,10 +321,22 @@ export default function Home() {
                 </button>
               ))}
             </div>
+            <button
+              type="button"
+              className={`route-scan-control ${routeScanActive ? "is-active" : ""}`}
+              onClick={() => setRouteScanActive((active) => !active)}
+              aria-pressed={routeScanActive}
+            >
+              {routeScanActive ? <Pause size={16} /> : <Play size={16} />}
+              {routeScanActive ? "Pause route scan" : "Run route scan"}
+              <span>{routeScanActive ? "LIVE" : "IDLE"}</span>
+            </button>
           </div>
-          <article className={`case-detail accent-${selected.accent}`} aria-live="polite">
+          <article className={`case-detail accent-${selected.accent} ${routeScanActive ? "is-scanning" : ""}`} aria-live="polite">
             <div className="case-visual">
-              <img src={selected.image} alt="Abstract visual for the selected portfolio project" />
+              <img src={selected.image} alt={selected.imageAlt} />
+              <span className="scan-indicator"><i /> {routeScanActive ? "ROUTE SCAN ACTIVE" : "MANUAL INSPECTION"}</span>
+              <span className="case-interface-label">{selected.evidenceLabel}</span>
               <div className="case-visual-caption"><span>System focus</span><strong>{selected.tags.join(" / ")}</strong></div>
               <div className="case-source-map">
                 <span>01 / SOURCE MAP</span>
@@ -299,7 +359,7 @@ export default function Home() {
 
         <section id="principles" className="section principle-section" aria-labelledby="principles-title">
           <div className="principle-intro">
-            <p className="section-index">03 / BUILD PRINCIPLES</p>
+            <p className="section-index">03 / METHOD / DECISION / STATE</p>
             <h2 id="principles-title">The system is only as good as the <em>thinking behind it.</em></h2>
           </div>
           <div className="principle-board">
